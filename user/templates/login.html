@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+
+<body>
+
+    <div class="container bg-light justify-content-center">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Render email/username field -->
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Email address</label>
+                {{ form.username }} <!-- Renders the username/email input -->
+                <!-- Display any errors related to the username field -->
+                {% if form.username.errors %}
+                <div style="color: red;">
+                    {% for error in form.username.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Render password field -->
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">Password</label>
+                {{ form.password }} <!-- Renders the password input -->
+                <!-- Display any errors related to the password field -->
+                {% if form.password.errors %}
+                <div style="color: red;">
+                    {% for error in form.password.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div>
+
+            <!-- Display non-field errors (e.g., invalid credentials) -->
+            {% if form.non_field_errors %}
+            <div style="color: red;">
+                {% for error in form.non_field_errors %}
+                <p>Invalid credentials</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+
+
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+
+</html>
