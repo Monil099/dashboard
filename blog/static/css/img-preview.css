@@ -1,0 +1,26 @@
+.lol {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    text-align: center;
+    align-content: center;
+}
+
+img {
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 3px 8px #ccc;
+    border-radius: 5px;
+    padding: 4px;
+    display: none;
+}
+
+img.show {
+    display: block;
+}
+
+input {
+    width: 100%;
+}
