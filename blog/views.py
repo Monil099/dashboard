@@ -15,14 +15,22 @@ def create_blog_post(request):
         title = request.POST["title"]
         content = request.POST['content']
         status = request.POST['status']
-        # status = request.POST["featured-image"]
+        featured_image = request.FILES['featured-image']
+        wp_api_media_url = 'https://darkslateblue-capybara-608439.hostingersite.com/wp-json/wp/v2/media'
+
+        media_response = requests.post(wp_api_media_url, headers=wordpress_header, files={'file': featured_image})
+        featured_image_id = None
+        if media_response.status_code == 201:
+            media_json = media_response.json()
+            featured_image_id = media_json['id']
+
         api_url = 'https://darkslateblue-capybara-608439.hostingersite.com/wp-json/wp/v2/posts'
         data = {
         'title' : title,
         'status': status,
         'slug' : 'example-post',
         'content': content,
-        'featured_media': 207
+        'featured_media': featured_image_id
         }
         response = requests.post(api_url,headers=wordpress_header, json=data)
         print(response)

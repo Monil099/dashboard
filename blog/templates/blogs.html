@@ -44,7 +44,7 @@
 <body>
     <h1>Create a new blog post</h1>
     <div class="container">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'blog-create' %}">
             {% csrf_token %}
 
             <!-- Username field -->
