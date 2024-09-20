@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'user',
     'blog',
+    'wp_site',
 ]
 
 MIDDLEWARE = [
