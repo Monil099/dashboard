@@ -5,15 +5,14 @@ from django.contrib.auth.decorators import login_required
 from wp_site.models import WpSite
 
 def create_blog_post(request):
+    result = {}
     if request.method == 'POST':
 
-
-        breakpoint()
         title = request.POST["title"]
         content = request.POST['content']
         status = request.POST['status']
         featured_image = request.FILES['featured-image']
-        sites = request.POST.getlist('site')
+        sites = request.POST.getlist('sites')
 
         for site in sites:
             site1 = WpSite.objects.filter(id=int(site)).first()
@@ -42,19 +41,15 @@ def create_blog_post(request):
             'featured_media': featured_image_id
             }
             response = requests.post(api_url,headers=wordpress_header, json=data)
-            print(response)
-            print(response.json()['guid'])
-            breakpoint()
-        form = "BlogPostForm(request.POST)"
-        if form.is_valid():
-            form.save()
-            return redirect('blog_list')
-    else:
-        form = "BlogPostForm()"
+            if response.status_code != 201:
+                result = {"msg-error": f"Failed to upload blog in {wordpress_url}"}
+            else:
+                wp_blog_url = response.json()['guid']
+                result = {"msg": f"Successfully uploaded blog in {wordpress_url}", "url": wp_blog_url.get('rendered')}
 
     _site = WpSite.objects.all().values("id","name")
 
-    return render(request, 'blogs.html', {'form': form, 'sites': _site})
+    return render(request, 'blogs.html', {'sites': _site, 'result': result})
 
 # def blog_list(request):
 #     blogs = BlogPost.objects.all()

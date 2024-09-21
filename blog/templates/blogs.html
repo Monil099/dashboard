@@ -48,13 +48,28 @@
 <body>
     <h1>Create a new blog post</h1>
     <div class="container">
+        {% if result %}
+        <ul>
+            <div class="alert alert-success" role="alert">
+                {% for key, value in result.items %}
+                {% if key == 'msg' %}
+                {{ value }}
+                {% endif %}
+                {% if key == 'url' %}
+                <a href="{{ value }}" target="_blank">View Blog</a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </ul>
+        {% endif %}
+
         <form method="POST" enctype="multipart/form-data" action="{% url 'blog-create' %}">
             {% csrf_token %}
 
             <!-- Username field -->
             <div class="form-group">
                 <label for="{{ form.username.id_for_label }}">Title</label>
-                <input type="text" name="title" id="">
+                <input class="form-control" type="text" name="title" id="">
                 {% if form.username.errors %}
                 <div class="text-danger">
                     {% for error in form.username.errors %}
@@ -69,7 +84,7 @@
                 <select class="form-select" name="sites" multiple aria-label="multiple select example">
                     <option disabled>Select sites</option>
                     {% for site in sites %}
-                        <option value="{{ site.id }}">{{ site.name }}</option>
+                    <option value="{{ site.id }}">{{ site.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -81,10 +96,6 @@
                     <input type="file" accept="image/*" name="featured-image" id="imageUploader">
                 </div>
             </div>
-
-
-
-
 
             <div class="form-group">
                 <label for="status">Status</label>
@@ -101,7 +112,7 @@
                 <textarea class="form-control" id="file-picker" name="content"></textarea>
             </div>
             <!-- Submit button -->
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
 
             <!-- Error message for non-field errors -->
             {% if form.non_field_errors %}
@@ -112,8 +123,6 @@
             </div>
             {% endif %}
         </form>
-        <!-- Link to login page -->
-        <p class="mt-3">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
     </div>
 
     <script src="https://cdn.tiny.cloud/1/ajpj1v4zq0azrhzr4c5355b3t8h3zjpd7n0c92qp1mg2dp1o/tinymce/7/tinymce.min.js"
