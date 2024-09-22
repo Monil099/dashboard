@@ -63,13 +63,13 @@
         </ul>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data" action="{% url 'blog-create' %}">
+        <form method="POST">
             {% csrf_token %}
 
             <!-- Username field -->
             <div class="form-group">
                 <label for="{{ form.username.id_for_label }}">Title</label>
-                <input class="form-control" type="text" name="title" id="">
+                <input class="form-control" type="text" name="title" id="" value="{{ blog.title }}">
                 {% if form.username.errors %}
                 <div class="text-danger">
                     {% for error in form.username.errors %}
@@ -90,14 +90,6 @@
             </div>
 
             <div class="form-group">
-                <label for="featured-image">Featured Image</label>
-                <div class='lol'>
-                    <img src="" alt="Image Preview">
-                    <input type="file" accept="image/*" name="featured-image" id="imageUploader">
-                </div>
-            </div>
-
-            <div class="form-group">
                 <label for="status">Status</label>
                 <select class="form-select" name="status" aria-label="Default select example">
                     <option selected value="publish">Publish</option>
@@ -109,7 +101,7 @@
 
             <div class="form-group">
                 <label for="content">Content</label>
-                <textarea class="form-control" id="file-picker" name="content"></textarea>
+                <textarea class="form-control" id="file-picker" name="content">{{ blog.content }}</textarea>
             </div>
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary">Upload</button>

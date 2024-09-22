@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Blog Post</title>
+
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/blogs.css' %}">
+
+    <style>
+        .lol {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            flex-wrap: wrap;
+            text-align: center;
+            align-content: center;
+        }
+
+        img {
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 3px 8px #ccc;
+            border-radius: 5px;
+            padding: 4px;
+            display: none;
+        }
+
+        img.show {
+            display: block;
+        }
+
+        input {
+            width: 100%;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>Create a new blog post</h1>
+    <div class="container">
+        {% if result %}
+        <ul>
+            <div class="alert alert-success" role="alert">
+                {% for key, value in result.items %}
+                {% if key == 'msg' %}
+                {{ value }}
+                {% endif %}
+                {% if key == 'url' %}
+                <a href="{{ value }}" target="_blank">View Blog</a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </ul>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Username field -->
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Title</label>
+                <input class="form-control" type="text" name="title" id="">
+                {% if form.username.errors %}
+                <div class="text-danger">
+                    {% for error in form.username.errors %}
+                    <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="featured-image">Select Sites</label>
+                <select class="form-select" name="sites" multiple aria-label="multiple select example">
+                    <option disabled>Select sites</option>
+                    {% for site in sites %}
+                    <option value="{{ site.id }}">{{ site.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select class="form-select" name="status" aria-label="Default select example">
+                    <option selected value="publish">Publish</option>
+                    <option value="draft">Draft</option>
+                    <option value="pending">Pending</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea class="form-control" id="file-picker" name="content"></textarea>
+            </div>
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary">Upload</button>
+
+            <!-- Error message for non-field errors -->
+            {% if form.non_field_errors %}
+            <div class="text-danger mt-2">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <script src="https://cdn.tiny.cloud/1/ajpj1v4zq0azrhzr4c5355b3t8h3zjpd7n0c92qp1mg2dp1o/tinymce/7/tinymce.min.js"
+        referrerpolicy="origin"></script>
+
+    <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const imageUploader = document.querySelector("#imageUploader");
+            const imagePreview = document.querySelector("img");
+
+            imageUploader.addEventListener("change", function () {
+                let reader = new FileReader();
+                reader.readAsDataURL(imageUploader.files[0]);
+                reader.onload = function (e) {
+                    imagePreview.classList.add("show");
+                    imagePreview.src = e.target.result;
+                };
+            });
+        });
+
+        tinymce.init({
+            selector: 'textarea#file-picker',
+            plugins: [
+                // Core editing features
+                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                // Your account includes a free trial of TinyMCE premium features
+            ],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ],
+            // plugins: 'image code',
+            // toolbar: 'undo redo | link image | code',
+            /* enable title field in the Image dialog*/
+            image_title: true,
+            /* enable automatic uploads of images represented by blob or data URIs*/
+            automatic_uploads: true,
+            /*
+              URL of our upload handler (for more details check: https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_url)
+              images_upload_url: 'postAcceptor.php',
+              here we add custom filepicker only to Image dialog
+            */
+            file_picker_types: 'image',
+            /* and here's our custom image picker*/
+            file_picker_callback: (cb, value, meta) => {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+
+                    const reader = new FileReader();
+                    reader.addEventListener('load', () => {
+                        /*
+                          Note: Now we need to register the blob in TinyMCEs image blob
+                          registry. In the next release this part hopefully won't be
+                          necessary, as we are looking to handle it internally.
+                        */
+                        const id = 'blobid' + (new Date()).getTime();
+                        const blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                        const base64 = reader.result.split(',')[1];
+                        const blobInfo = blobCache.create(id, file, base64);
+                        blobCache.add(blobInfo);
+
+                        /* call the callback and populate the Title field with the file name */
+                        cb(blobInfo.blobUri(), { title: file.name });
+                    });
+                    reader.readAsDataURL(file);
+                });
+
+                input.click();
+            },
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Blogs</title>
+
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/blogs.css' %}">
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <!-- DataTables Buttons Extension CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+
+</head>
+
+<body>
+    <h1>All Blogs</h1>
+    <div class="container">
+        {% if result %}
+        <ul>
+            <div class="alert alert-success" role="alert">
+                {% for key, value in result.items %}
+                {% if key == 'msg' %}
+                {{ value }}
+                {% endif %}
+                {% endfor %}
+            </div>
+        </ul>
+        {% endif %}
+        <table class="cell-border" id="example">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Created By</th>
+                    <th scope="col">Updated At</th>
+                    <th scope="col">Site</th>
+                    <th scope="col">Attributes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for blog in blogs %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th> <!-- Auto-incrementing row number -->
+                    <td>{{ blog.title }}</td>
+                    <td>{{ blog.status }}</td>
+                    <td>{{ blog.created_by.username }}</td> <!-- Assuming 'created_by' is a ForeignKey to User -->
+                    <td>{{ blog.updated_at }}</td> <!-- Assuming 'updated_at' exists -->
+                    <td>
+                        <!-- Loop through related sites for each blog -->
+                        {% for blogsite in blog.wpblogsite_set.all %}
+                        {{ blogsite.site.name }}{% if not forloop.last %}, <br>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url 'blog_get' blog.id %}" role="button">Edit</a>
+                        <a class="btn btn-danger" href="{% url 'blog_delete' blog.id %}" role="button">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No blogs found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- DataTables JS CDN -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- DataTables Buttons Extension JS CDN -->
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.colVis.min.js"></script>
+
+    <!-- JSZip for exporting to Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+    <!-- PDFMake for exporting to PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({});
+        });
+    </script>
+
+</body>
+
+</html>

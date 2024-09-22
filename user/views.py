@@ -4,9 +4,13 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout as auth_logout
 from .forms import RegisterForm
+from django.contrib.auth.decorators import login_required
 
 # Registration view
+@login_required
 def register_view(request):
+    if not request.user.is_superuser:
+        return redirect('home')
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -24,7 +28,9 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+
+            next_url = request.GET.get('next', 'home')
+            return redirect(next_url)
     else:
         form = AuthenticationForm()
     
