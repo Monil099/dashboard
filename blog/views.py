@@ -8,6 +8,9 @@ from .models import WpBlog, WpSite, WpBlogSite
 import base64
 import requests
 
+def home_view(request):
+    return render(request, 'blog_list.html')
+
 class CreateBlogPostView(LoginRequiredMixin, CreateView):
     model = WpBlog
     template_name = 'blog_upload.html'
