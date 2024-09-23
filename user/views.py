@@ -10,13 +10,13 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def register_view(request):
     if not request.user.is_superuser:
-        return redirect('home')
+        return redirect('blog_list')
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')
+            return redirect('blog_list')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
@@ -28,8 +28,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-
-            next_url = request.GET.get('next', 'home')
+            next_url = request.GET.get('next', 'blog_list')
             return redirect(next_url)
     else:
         form = AuthenticationForm()
