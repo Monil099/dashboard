@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+  
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Blogs</title>
@@ -25,9 +27,11 @@
 </head>
 
 <body>
+
+    <div id="head-content"></div>
     <h2>Welcome to the Home Page</h2>
     {% if user.is_authenticated %}
-    <p>Hello, {{ user.username }}!</p>
+    <p> {{ user.username }}!</p>
     <a href="{% url 'logout' %}">Logout</a>
     {% else %}
     <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a>
@@ -85,6 +89,11 @@
             </tbody>
         </table>
     </div>
+
+    
+
+
+
 
     <!-- DataTables JS CDN -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
