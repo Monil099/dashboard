@@ -46,7 +46,7 @@
 </head>
 
 <body>
-    <h1>Create a new blog post</h1>
+    <h1>Update blog post</h1>
     <div class="container">
         {% if result %}
         <ul>
@@ -63,7 +63,7 @@
         </ul>
         {% endif %}
 
-        <form method="POST">
+        <form method="post" action="{% url 'blog_update' blog.id %}">
             {% csrf_token %}
 
             <!-- Username field -->
@@ -84,7 +84,10 @@
                 <select class="form-select" name="sites" multiple aria-label="multiple select example">
                     <option disabled>Select sites</option>
                     {% for site in sites %}
-                    <option value="{{ site.id }}">{{ site.name }}</option>
+                    <option value="{{ site.id }}"
+                        {% if site.id in selected_sites %} selected {% endif %}>
+                        {{ site.name }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -96,6 +99,16 @@
                     <option value="draft">Draft</option>
                     <option value="pending">Pending</option>
                     <option value="private">Private</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="categories">Categories</label>
+                <select class="form-select" name="categories" aria-label="Default select example">
+                    <option selected value="Getting Started with eSIM">Getting Started with eSIM</option>
+                    <option value="Plans and Payments">Plans and Payments</option>
+                    <option value="Troubleshooting">Troubleshooting</option>
+                    <option value="FAQ">FAQ</option>
                 </select>
             </div>
 
