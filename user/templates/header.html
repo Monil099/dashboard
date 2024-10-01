@@ -1,13 +1,9 @@
-<head>
-    <div class="navbar navbar-inverse navbar-static-top">
-        <div class="container">HEEEYYYYY
-            <a href="" class="navbar-brand">{{ user.username }}</a>
-            <div class="collapse navbar-collapse navHeaderCollapse">
-                <ul class="nav navbar-nav navbar-right text-center">
-                    <li class="active"><a href="#">prvo</a></li>
-                    <li><a href="#">trece</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</head>
+<h2>Header</h2>
+    {% if user.is_authenticated %}
+    <p>Hello, {{ user.username }}!</p>
+    <a href="{% url 'logout' %}">Logout</a>
+
+    <a href="{% url 'logout' %}">Logout</a> | <a href="{% url 'blog_new' %}">Upload Blog</a> | <a href="{% url 'blog_list' %}">Blog List</a>
+    {% else %}
+    <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a>
+    {% endif %}
