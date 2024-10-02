@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+7=z^pimqq&4vg5&m%zvo3f5m#yukrf^$!t)s+0m2#sifo%2ie
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'helpcenter.airhubapp.com.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'helpcenter.airhubapp.com.com', '147.79.71.234']
 
 
 # Application definition
