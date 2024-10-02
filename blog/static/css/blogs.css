@@ -1,3 +1,71 @@
-*{
-    margin: auto;
+/* Remove the global auto margin */
+* {
+    margin: 0;
+    padding: 0; /* Reset padding globally as well for cleaner layout */
 }
+
+.navbar {
+    background-color: #0f655f;
+}
+
+.navbar-brand {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: #fff;
+    position: relative;
+    transition: 0.3s;
+    font-weight: 400;
+}
+
+.navbar-nav .nav-item .nav-link::before {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #e7fffd;
+    transition: 0.3s;
+}
+
+.navbar-nav .nav-item .nav-link:hover::before {
+    width: 100%;
+}
+
+/* Ensure nav items are aligned right and remove padding/margin */
+.navbar-nav.ms-auto {
+    margin-left: auto; /* Bootstrap class to push items to the right */
+    margin-right: 0; /* Optional: Ensures no margin on the right */
+    padding-right: 0; /* Optional: Remove padding from the right */
+}
+
+/* Custom CSS */
+.login-error {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container.blog-container {
+    margin-top: 50px;
+}
+.container{
+    margin-top: 10px;
+    margin-bottom: 10px;;
+}
+
+.new-blog {
+    text-align: center;
+    margin-top: 20px;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+

@@ -50,7 +50,6 @@ class CreateBlogPostView(LoginRequiredMixin, CreateView):
             data = {
                 'title': form.cleaned_data['title'],
                 'status': form.cleaned_data['status'],
-                'slug': 'example-post',
                 'content': form.cleaned_data['content'],
                 "categories": category_id
             }
