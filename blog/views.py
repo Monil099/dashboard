@@ -84,7 +84,7 @@ class BlogListView(ListView):
 
     def get_queryset(self):
         # Use prefetch_related to fetch related site names efficiently
-        return WpBlog.objects.prefetch_related('wpblogsite_set__site').all()
+        return WpBlog.objects.prefetch_related('wpblogsite_set__site').order_by('-id').all()
 
 
 class BlogByIdView(LoginRequiredMixin, View):
