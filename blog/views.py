@@ -106,6 +106,7 @@ class BlogUpdateView(views.View):
         content = request.POST.get('content', blog.content)
         status = request.POST.get('status', blog.status)
 
+        # Update the blog locally
         blog.title = title
         blog.content = content
         blog.status = status
@@ -117,10 +118,6 @@ class BlogUpdateView(views.View):
 
         for site_id in sites:
             site = get_object_or_404(WpSite, id=int(site_id))  # Fetch the site
-            data = WpBlogSite.objects.filter(blog=blog, site=site_id)
-            # (WpBlog, site_id=int(site_id))  # Fetch the site
-
-            # Prepare WordPress API credentials
             wordpress_url = site.url
             wordpress_user = site.wp_username
             wordpress_password = site.wp_password
@@ -128,41 +125,46 @@ class BlogUpdateView(views.View):
             wordpress_token = base64.b64encode(wordpress_credentials.encode())
             wordpress_header = {'Authorization': 'Basic ' + wordpress_token.decode('utf-8')}
 
-            blog_sites = WpBlogSite.objects.filter(blog=blog).all()
+            # Get the blog-site relationship
+            blog_site, created = WpBlogSite.objects.get_or_create(blog=blog, site=site)
+            wordpress_post_id = blog_site.wp_blog_id
 
-            for blog_site in blog_sites:
-                categories = self.request.POST.get("categories")
-                category_id = None
-                for category, id in categories_list.items():
-                    if category == categories:
-                        category_id = id
-                wordpress_post_id = blog_site.wp_blog_id
-                api_url = f'{wordpress_url}/wp-json/wp/v2/posts/{wordpress_post_id}'
-                data = {
-                    'title': title,
-                    'status': status,
-                    'content': content,
-                    "categories": category_id,
-                    'slug': slugify(title),
-                }
+            # Prepare the categories (Assuming you have a categories list in your form)
+            categories = self.request.POST.get("categories")
+            category_id = None
+            for category, id in categories_list.items():
+                if category == categories:
+                    category_id = id
 
-                # Make the request to the WordPress site
-                response = requests.post(api_url, headers=wordpress_header, json=data)
+            # Prepare the data for WordPress API request
+            api_url = f'{wordpress_url}/wp-json/wp/v2/posts/{wordpress_post_id}'
+            data = {
+                'title': title,
+                'status': status,
+                'content': content,
+                "categories": category_id,
+                'slug': slugify(title),
+            }
 
-                # Handle the response and update the result context
-                if response.status_code != 200:
-                    result[site_id] = {"msg-error": f"Failed to upload blog to {wordpress_url}"}
-                else:
-                    blog_json = response.json()
-                    wp_blog_id = blog_json["id"]
-                    wp_blog_url = blog_json['guid']['rendered']
-                    result[site_id] = {"msg": f"Successfully uploaded blog to {wordpress_url}", "url": wp_blog_url}
-                    # Save the relationship between the blog and the sites
-                    WpBlogSite.objects.get_or_create(blog=blog, site=site, wp_blog_id=wp_blog_id)
+            # Make the request to the WordPress site
+            response = requests.post(api_url, headers=wordpress_header, json=data)
+
+            # Handle the response and update the result context
+            if response.status_code != 200:
+                result[site_id] = {"msg-error": f"Failed to upload blog to {wordpress_url}"}
+            else:
+                blog_json = response.json()
+                wp_blog_id = blog_json["id"]
+                wp_blog_url = blog_json['guid']['rendered']
+                result[site_id] = {"msg": f"Successfully uploaded blog to {wordpress_url}", "url": wp_blog_url}
+                # Update the wp_blog_id in case it's newly created
+                blog_site.wp_blog_id = wp_blog_id
+                blog_site.save()
 
         # Pass the result to the context and redirect
         self.request.session['result'] = result  # Store the result in session for display
         return redirect('blog_list')  # Redirect to the detail page or another view
+
 
 
 class BlogDeleteView(views.View):
