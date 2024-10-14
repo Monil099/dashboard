@@ -8,6 +8,9 @@ from .models import WpBlog, WpSite, WpBlogSite
 import base64
 import requests
 from blog.categories import categories_list
+from django.utils.text import slugify
+from datetime import datetime
+
 
 def home_view(request):
     return render(request, 'blog_list.html')
@@ -45,13 +48,16 @@ class CreateBlogPostView(LoginRequiredMixin, CreateView):
             wordpress_credentials = f"{wordpress_user}:{wordpress_password}"
             wordpress_token = base64.b64encode(wordpress_credentials.encode())
             wordpress_header = {'Authorization': 'Basic ' + wordpress_token.decode('utf-8')}
+            post_date = datetime.now().isoformat()
 
             api_url = f'{wordpress_url}/wp-json/wp/v2/posts'
             data = {
                 'title': form.cleaned_data['title'],
                 'status': form.cleaned_data['status'],
                 'content': form.cleaned_data['content'],
-                "categories": category_id
+                "categories": category_id,
+                'slug': slugify(form.cleaned_data['title']),
+                'date': post_date
             }
 
             response = requests.post(api_url, headers=wordpress_header, json=data)
@@ -136,14 +142,15 @@ class BlogUpdateView(views.View):
                     'title': title,
                     'status': status,
                     'content': content,
-                    "categories": category_id
+                    "categories": category_id,
+                    'slug': slugify(title),
                 }
 
                 # Make the request to the WordPress site
-                response = requests.patch(api_url, headers=wordpress_header, json=data)
+                response = requests.post(api_url, headers=wordpress_header, json=data)
 
                 # Handle the response and update the result context
-                if response.status_code != 201:
+                if response.status_code != 200:
                     result[site_id] = {"msg-error": f"Failed to upload blog to {wordpress_url}"}
                 else:
                     blog_json = response.json()
